@@ -16,10 +16,14 @@ of favorite seach objects with the following schema:
 const initialState = {
   currentSearch: {
     _id: '',
+    title: '',
     healthScore: '',
     yelpResult: {},
     walkScore: '',
     iqAirScore: '',
+    lat: '',
+    lng: '',
+    userid: '',
   },
 
   favoriteSearches: {
@@ -30,6 +34,9 @@ const initialState = {
       yelpResult: { restaurants: 106, gyms: 113 },
       walkScore: 91,
       iqAirScore: 3,
+      lat: 40.23302,
+      lng: -70.12219,
+      userid: '',
     },
     2: {
       _id: 2,
@@ -38,6 +45,9 @@ const initialState = {
       yelpResult: { restaurants: 415000, gyms: 1 },
       walkScore: 2,
       iqAirScore: 780,
+      lat: 10.23302,
+      lng: -80.12219,
+      userid: '',
     },
     3: {
       _id: 3,
@@ -46,6 +56,9 @@ const initialState = {
       yelpResult: { restaurants: 487, gyms: 200 },
       walkScore: 75,
       iqAirScore: 106,
+      lat: -30.23302,
+      lng: 50.12219,
+      userid: '',
     },
   },
   favoriteSearchIds: [1, 2, 3],
@@ -123,7 +136,7 @@ export default favoritesReducer;
   Action Generators
 --------------------*/
 const { apiCallRequested } = apiActions;
-const favoritesUrl = '/whateverTheBackendNeeds';
+const favoritesUrl = '/favorites';
 
 // Returns function that, when called creates an API action object with the following payload
 // This is set up to take a user ID and send it to the backend as a param
