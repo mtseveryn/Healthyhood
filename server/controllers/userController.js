@@ -13,7 +13,6 @@ const findUserByEmail = async (email) => {
   const user = await pool.query('SELECT * FROM users WHERE email = $1', [
     email,
   ]);
-
   return user.rows[0];
 };
 
@@ -124,6 +123,61 @@ const login = async (req, res, next) => {
   }
 };
 
+const getUpdatedFavs = async (userid) => {
+  const favsList = await pool.query(
+    'SELECT * FROM public.favorites WHERE userid = $1',
+    [userid]
+  );
+  return favsList.rows;
+};
+
+// Add Favorite
+const postFavorite = async (req, res, next) => {
+  try {
+    const {
+      title,
+      healthScore,
+      yelpResult,
+      walkScore,
+      iqAirScore,
+      lat,
+      lng,
+      userid,
+    } = req.body;
+
+    const favArr = [
+      title,
+      healthScore,
+      yelpResult.restaurants,
+      yelpResult.gyms,
+      walkScore,
+      iqAirScore,
+      lat,
+      lng,
+      userid,
+    ];
+
+    const addFavorite = await pool.query(
+      'INSERT INTO public.favorites VALUES ($1,$2,$3,$4,$5,$6,$7,$8, $9) RETURNING *',
+      favArr
+    );
+    res.status(200).send(addFavorite.rows[0]);
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+};
+
+const getAllFavorites = async (req, res, next) => {
+  try {
+    const { id: userid } = req.params;
+    const favs = await getUpdatedFavs(userid);
+    return res.status(200).send(favs);
+  } catch (err) {
+    return next(err);
+  }
+};
+
 // ------
 // Export
 // ------
@@ -131,4 +185,6 @@ const login = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  postFavorite,
+  getAllFavorites,
 };
