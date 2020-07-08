@@ -2,9 +2,16 @@ import React from 'react';
 import { PropTypes } from 'prop-types';
 import './Favorites.css';
 
-const SearchCard = ({
-  searchObj: { _id, title, healthScore, yelpResult, walkScore, iqAirScore },
-}) => {
+const SearchCard = ({ searchObj }) => {
+  const {
+    _id,
+    title,
+    healthScore,
+    yelpResult,
+    walkScore,
+    iqAirScore,
+  } = searchObj;
+
   const removeFavorite = () => {
     console.log('favorite id', _id);
   };
@@ -42,7 +49,8 @@ SearchCard.propTypes = {
   searchObj: PropTypes.shape({
     _id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
-    healthScore: PropTypes.number.isRequired,
+    healthScore: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
     yelpResult: PropTypes.shape({
       restaurants: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       gyms: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

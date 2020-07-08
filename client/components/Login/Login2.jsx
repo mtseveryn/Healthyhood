@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import Form from '../common/Form';
 import FormInput from '../common/FormInput';
 import FormButton from '../common/FormButton';
-import { login } from '../../store/entities/userEntity';
+import { setIsLoggedIn, login } from '../../store/entities/userEntity';
 import './Login.css';
 
 const Login = () => {
@@ -29,15 +29,21 @@ const Login = () => {
   };
 
   const loginUser = (data) => {
-    dispatch(login(data));
+    return dispatch(login(data));
   };
 
   const joiSchema = Joi.object(schema);
 
-  const doSubmit = (data) => {
-    console.log('submitting', data);
-    const user = loginUser(data);
-    console.log('user', user);
+  const doSubmit = async (data) => {
+    try {
+      const userReceived = await loginUser(data);
+
+      dispatch(setIsLoggedIn(true));
+      window.location = '/';
+    } catch (e) {
+      console.log('error', e);
+      alert(`Somethin' wrong. You ain't logged in`);
+    }
   };
 
   return (
@@ -56,12 +62,6 @@ const Login = () => {
             label="Password"
             type="password"
           />
-          <FormInput
-            name={inputFields.remember}
-            label="Remember Me"
-            type="checkbox"
-          />
-
           <FormButton label="Submit" />
         </Form>
         <div className="lh-copy mt3">

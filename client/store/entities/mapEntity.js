@@ -139,7 +139,6 @@ function iqAirDataReceivedCase(state, action) {
 }
 
 function healthScoreReceivedCase(state, action) {
-  console.log('health payload', action.payload);
   const { data: healthScore } = action.payload;
   state.healthScore = healthScore;
   state.healthComputed = true;
@@ -156,7 +155,7 @@ const walkDataUrl = '/walkscore';
 const iqAirUrl = '/iqair';
 const healthScoreUrl = '/healthyscore';
 
-export const getYelpData = latLongObj => {
+export const getYelpData = (latLongObj) => {
   const { lat, lng } = latLongObj;
   const newUrl = `${yelpDataUrl}?latitude=${lat}&longitude=${lng}`;
   return apiCallRequested({
@@ -171,7 +170,7 @@ export const getYelpData = latLongObj => {
   });
 };
 
-export const getWalkData = latLonObj => {
+export const getWalkData = (latLonObj) => {
   const { lat, lng } = latLonObj;
   const newUrl = `${walkDataUrl}?lat=${lat}&lon=${lng}`;
   return apiCallRequested({
@@ -186,7 +185,7 @@ export const getWalkData = latLonObj => {
   });
 };
 
-export const getIqAirData = latLonObj => {
+export const getIqAirData = (latLonObj) => {
   const { lat, lng } = latLonObj;
   const newUrl = `${iqAirUrl}?lat=${lat}&lon=${lng}`;
   return apiCallRequested({
@@ -201,7 +200,7 @@ export const getIqAirData = latLonObj => {
   });
 };
 
-export const getHealthScore = secretSauceObj => {
+export const getHealthScore = (secretSauceObj) => {
   const { walkScore, yelpGyms, yelpRestaurants, iqAirScore } = secretSauceObj;
   const newUrl = `${healthScoreUrl}?walkscore=${walkScore}&yelpgyms=${yelpGyms}&yelprestaurants=${yelpRestaurants}&iqairscore=${iqAirScore}`;
   return apiCallRequested({

@@ -14,9 +14,9 @@ const initialState = {
   isLoggedIn: false,
   defaultToSignUp: true,
   user: {
+    id: '',
     email: '',
-    password: '',
-    joinedon: '',
+    joinedOn: '',
   },
   errors: {
     email: ['Email is required'],
@@ -115,9 +115,9 @@ function setPasswordCase(state, action) {
 
 function updateUserCase(state, action) {
   const resetUser = {
+    id: '',
     email: '',
-    password: '',
-    joinedon: '',
+    joinedOn: '',
   };
   state.user = { ...resetUser, ...action.payload };
 }
@@ -146,8 +146,8 @@ Confusing, but solid practice and implacations extend beyond fetch requests.
 // Action Generators -- Functions for API calls
 
 const { apiCallRequested } = apiActions;
-const usersUrl = '/whateverTheBackendNeeds';
 const loginUrl = '/user/login';
+const checkCurrentTokenUrl = '/checkCurrentToken';
 
 // Returns function that, when called creates an API action object with the following payload
 export const login = (loginObj) =>
@@ -155,6 +155,16 @@ export const login = (loginObj) =>
     url: loginUrl,
     method: 'post',
     data: loginObj, // Likely needs userName and password
+    onStart: USERS_REQUEST, // These three props are actions to be dispatched by our API middleware
+    onSuccess: RECEIVED_USER,
+    onError: USERS_REQUEST_FAILED,
+  });
+
+export const checkCurrentToken = () =>
+  apiCallRequested({
+    url: checkCurrentTokenUrl,
+    method: 'get',
+    data: '',
     onStart: USERS_REQUEST, // These three props are actions to be dispatched by our API middleware
     onSuccess: RECEIVED_USER,
     onError: USERS_REQUEST_FAILED,

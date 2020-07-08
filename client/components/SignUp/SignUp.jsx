@@ -164,8 +164,9 @@ const SignUp = ({
         // update state with User info
 
         updateUser({
+          id: parsedResponse.data.id,
           email,
-          joinedon: new Date().toDateString(),
+          joinedOn: new Date().toDateString(),
         });
 
         //switches page to UserSection component when isLoggedIn is set to true

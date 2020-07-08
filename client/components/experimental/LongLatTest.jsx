@@ -11,6 +11,11 @@ import {
   getHealthScore,
   toggleInitialLoad,
 } from '../../store/entities/mapEntity';
+import {
+  updateCurrentSearch,
+  updateTitleDisplay,
+} from '../../store/entities/favoritesEntity';
+import TitleForm from '../Favorites/TitleForm';
 import WheelLoader from '../common/experimental/WheelLoader/WheelLoader';
 import SphereLoader from '../common/experimental/SphereLoader/SphereLoader';
 
@@ -72,7 +77,25 @@ class LongLatTest extends Component {
       iqAirScore: iqAirData.data.current.pollution.aqius,
     };
 
-    getHealthScore(secretSauceObj);
+    const healthScore = await getHealthScore(secretSauceObj);
+
+    const currentSearch = {
+      healthScore: healthScore.payload.data,
+      yelpResult: {
+        restaurants: restaurants.total,
+        gyms: gyms.total,
+      },
+      walkScore: secretSauceObj.walkScore,
+      iqAirScore: secretSauceObj.iqAirScore,
+      lat: userEnteredLocation.lat,
+      lng: userEnteredLocation.lng,
+      userId: this.props.user.id,
+    };
+    this.props.updateCurrentSearch(currentSearch);
+  };
+
+  saveFavorite = () => {
+    this.props.updateTitleDisplay();
   };
 
   displayYelpScore = (restaurants, gyms) => {
@@ -163,6 +186,12 @@ class LongLatTest extends Component {
               Get Health
             </button>
           )}
+          {healthComputed && (
+            <button className="saveFavoriteButton" onClick={this.saveFavorite}>
+              Save Favorite
+            </button>
+          )}
+          {this.props.titleDisplay && <TitleForm />}
         </div>
       </div>
     );
@@ -171,6 +200,8 @@ class LongLatTest extends Component {
 
 const mapStateToProps = (state) => ({
   map: state.map,
+  user: state.users.user,
+  titleDisplay: state.favorites.titleDisplay,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -180,6 +211,9 @@ const mapDispatchToProps = (dispatch) => ({
   getIqAirData: (latLongObj) => dispatch(getIqAirData(latLongObj)),
   getHealthScore: (secretSauceObj) => dispatch(getHealthScore(secretSauceObj)),
   toggleInitialLoad: () => dispatch(toggleInitialLoad()),
+  updateCurrentSearch: (currentSearch) =>
+    dispatch(updateCurrentSearch(currentSearch)),
+  updateTitleDisplay: () => dispatch(updateTitleDisplay()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LongLatTest);

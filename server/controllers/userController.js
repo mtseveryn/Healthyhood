@@ -54,7 +54,7 @@ const validatePassword = (password) => {
 
 const register = async (req, res, next) => {
   try {
-    console.log(req.body);
+    console.log('Register Body', req.body);
     const { email, password } = req.body;
     const user = await findUserByEmail(email);
 
@@ -82,13 +82,18 @@ const register = async (req, res, next) => {
       [email, encryptedPassword]
     );
 
+    // Prevent returning Password
+    const userObj = newUser.rows[0];
+    const clientUserObj = { id: userObj.id, email: userObj.email };
+
     // Create a JWT
-    const payload = { email };
+    const payload = clientUserObj;
     const token = jwt.sign(payload, process.env.JWTSECRET, { expiresIn: '1h' });
 
+    console.log('finalUserObj', clientUserObj);
     return res
       .cookie('token', token, { httpOnly: true })
-      .send({ data: newUser.rows[0] });
+      .send({ data: clientUserObj });
   } catch (err) {
     return next(err);
   }
@@ -112,22 +117,23 @@ const login = async (req, res, next) => {
       return res.status(401).json({ message: 'Incorrect Email or Password' });
     }
 
+    const clientUserObj = { id: user.id, email: user.email };
     // generate JWT
-    const payload = { email };
+    const payload = clientUserObj;
     const token = jwt.sign(payload, process.env.JWTSECRET, {
       expiresIn: '1h',
     });
 
-    return res.cookie('token', token, { httpOnly: true }).send({ email }); // maybe favorites
+    return res.cookie('token', token, { httpOnly: true }).send(clientUserObj); // maybe favorites
   } catch (err) {
     return next(err);
   }
 };
 
-const getUpdatedFavs = async (userid) => {
+const getUpdatedFavs = async (userId) => {
   const favsList = await pool.query(
     'SELECT * FROM public.favorites WHERE userid = $1',
-    [userid]
+    [userId]
   );
   return favsList.rows;
 };
@@ -143,7 +149,7 @@ const postFavorite = async (req, res, next) => {
       iqAirScore,
       lat,
       lng,
-      userid,
+      userId,
     } = req.body;
 
     const favArr = [
@@ -155,14 +161,38 @@ const postFavorite = async (req, res, next) => {
       iqAirScore,
       lat,
       lng,
-      userid,
+      userId,
     ];
 
     const addFavorite = await pool.query(
       'INSERT INTO public.favorites VALUES ($1,$2,$3,$4,$5,$6,$7,$8, $9) RETURNING *',
       favArr
     );
-    res.status(200).send(addFavorite.rows[0]);
+    const {
+      title: newTitle,
+      healthscore,
+      restaurants,
+      gyms,
+      walkscore,
+      iqairscore,
+      lat: newLat,
+      lng: newLng,
+      userid,
+      favid,
+    } = addFavorite.rows[0];
+
+    const restructuredFavorite = {
+      _id: favid,
+      title: newTitle,
+      healthScore: healthscore,
+      yelpResult: { restaurants, gyms },
+      walkScore: walkscore,
+      iqAirScore: iqairscore,
+      lat: newLat,
+      lng: newLng,
+      userid,
+    };
+    res.status(200).send(restructuredFavorite);
     return next();
   } catch (err) {
     return next(err);
@@ -170,10 +200,39 @@ const postFavorite = async (req, res, next) => {
 };
 
 const getAllFavorites = async (req, res, next) => {
+  console.log('reqPArams', req.params);
   try {
-    const { id: userid } = req.params;
-    const favs = await getUpdatedFavs(userid);
-    return res.status(200).send(favs);
+    const { id: userId } = req.params;
+    const favs = await getUpdatedFavs(userId);
+    const restructuredFaves = favs.map((faveSearch) => {
+      const {
+        title,
+        healthscore,
+        restaurants,
+        gyms,
+        walkscore,
+        iqairscore,
+        lat,
+        lng,
+        userid,
+        _id,
+        favid,
+      } = faveSearch;
+
+      return {
+        _id: favid,
+        title,
+        healthScore: healthscore,
+        yelpResult: { restaurants, gyms },
+        walkScore: walkscore,
+        iqAirScore: iqairscore,
+        lat,
+        lng,
+        userid,
+      };
+    });
+
+    return res.status(200).send(restructuredFaves);
   } catch (err) {
     return next(err);
   }

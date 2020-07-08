@@ -23,27 +23,27 @@ function MyComponent() {
     autoLocation,
     userEnteredLocation,
     initialLoad,
-  } = useSelector(state => state.map);
+  } = useSelector((state) => state.map);
   const { restaurants, gyms } = yelpData;
 
   const dispatch = useDispatch();
 
   // console.log('userLoc', userEnteredLocation);
-  console.log('yelp1', yelpData);
+  // console.log('yelp1', yelpData);
   // console.log('walk', walkData);
 
   const mapCenter = userEnteredLocation.isPrimary
     ? userEnteredLocation
     : autoLocation;
 
-  const onLoad = React.useCallback(map => {
+  const onLoad = React.useCallback((map) => {
     // console.log('map', map);
     const bounds = new window.google.maps.LatLngBounds();
     // map.fitBounds(bounds);
     setMap(map);
   }, []);
 
-  const onUnmount = React.useCallback(map => {
+  const onUnmount = React.useCallback((map) => {
     setMap(null);
   }, []);
 

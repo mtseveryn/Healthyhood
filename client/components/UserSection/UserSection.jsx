@@ -9,7 +9,6 @@ import MapPlaceholder from '../common/experimental/MapPlaceholder/MapPlaceholder
 const UserSection = () => {
   const map = useSelector((state) => state.map);
   const loading = map.isLoading;
-  console.log('loading', loading);
 
   return (
     <div className="mapcontainer">

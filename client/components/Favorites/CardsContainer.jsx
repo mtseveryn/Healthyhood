@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { getFavorites } from '../../store/entities/favoritesEntity';
 import SearchCard from './SearchCard';
 import Suspend from '../common/Suspend';
 import './Favorites.css';
 import SearchCardPlaceholder from '../common/experimental/SearchCardPlaceholder/SearchCardPlaceholder';
 
 const CardsContainer = () => {
+  const userId = useSelector((state) => state.users.user.id);
+  const dispatch = useDispatch();
+
   const favoriteSearchIds = useSelector(
     (state) => state.favorites.favoriteSearchIds
   );
@@ -13,6 +17,10 @@ const CardsContainer = () => {
   const favoriteSearches = useSelector(
     (state) => state.favorites.favoriteSearches
   );
+
+  useEffect(() => {
+    dispatch(getFavorites(userId));
+  }, []);
 
   const loading = useSelector((state) => state.favorites.loading);
 
